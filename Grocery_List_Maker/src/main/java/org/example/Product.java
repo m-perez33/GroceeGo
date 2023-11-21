@@ -46,6 +46,9 @@ abstract class Product {
         this.cost = cost;
     }
 
+    public Product() {
+
+    }
 
 
 

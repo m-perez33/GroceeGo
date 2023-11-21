@@ -8,6 +8,9 @@ public class Produce extends Product {
         super(productName, quantity, cost);
 
     }
+    public Produce(){
+
+    }
 
     @Override
     public String toString() {
