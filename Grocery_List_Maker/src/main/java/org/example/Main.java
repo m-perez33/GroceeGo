@@ -1,151 +1,214 @@
 package org.example;
 
+import org.example.Model.ListEntry;
+import org.example.Model.ShoppingList;
+
 import java.sql.SQLOutput;
 import java.util.*;
 
 public class Main {
 
-    private static final List<Product> shoppingList = new ArrayList<>();
+    private static final List<ShoppingList> SHOPPING_LISTS = new ArrayList<>();
 
-    private static final List<Product> favorites = new ArrayList<>();
+    private static final List<org.example.Model.Product> PRODUCTS = new ArrayList<>();
 
-    private static final List<Product> items = new ArrayList<>();
+    private static final List<ListEntry> LIST_ENTRIES = new ArrayList<>();
 
-    private static final List<List<Product>> shoppingLists = new ArrayList<>();
+    private static ShoppingList shoppinglist;
 
 
     private static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
+        System.out.println("");
+        System.lineSeparator();
 
         mainMenu();
-
-
 
     }
 
 
     public static void mainMenu() {
 
-        System.out.println(
-                "1. List All Items" + System.lineSeparator() +
-                        "2. List Favorite Grocery Items" + System.lineSeparator() +
-                        "3. List previous shopping lists" + System.lineSeparator() +
-                        "4. Create new shopping list" + System.lineSeparator());
+        if (SHOPPING_LISTS.size() == 0) {
+            System.out.println("Create new shopping list" + System.lineSeparator());
+            //if no shopping lists immediately load create list product menu
+            createShoppingList();
+
+        } else {
+            //otherwise give options
+            System.out.println("1. Create new shopping list");
+            System.out.println("2. Edit existing shopping lists" + System.lineSeparator());
+
+            System.out.println("Please make your selection: ");
+            String number = sc.nextLine();
+
+            menuSelection(Integer.parseInt(number));
+        }
 
 
-        System.out.println("Please make your selection: ");
-        String number = sc.nextLine();
+    }
 
-        menuSelection(Integer.parseInt(number));
+    public static void editExistingSubMenu() {
 
+        System.out.println("1. Add product to list" + System.lineSeparator() +
+                "2. Update list" + System.lineSeparator() +
+                "3. Delete List");
+    }
+
+    public static void createShoppingList() {
+
+        //create list
+        System.out.println("Please name your list: ");
+        String listname = sc.nextLine();
+
+        ShoppingList shoppingList = new ShoppingList(listname);
+
+        SHOPPING_LISTS.add(shoppingList);
+
+        shoppingList.setListId(SHOPPING_LISTS.indexOf(shoppingList) + 1);
+
+        selectProductCategoryMenu(shoppingList);
+
+    }
+
+    public static void selectProductCategoryMenu(ShoppingList shoppingList) {
+
+        System.lineSeparator();
+        System.out.println("Please select product category: ");
+        System.out.println("1. Produce" + System.lineSeparator() +
+                "2. Meat" + System.lineSeparator() +
+                "3. Deli" + System.lineSeparator());
+        String menuNumber = sc.nextLine();
+        int number = Integer.parseInt(menuNumber);
+
+        loadProductData(number, shoppingList);
+
+        subMenu1(shoppingList);
+
+
+    }
+
+    public static void subMenu1(ShoppingList shoppingList) {
+
+        System.lineSeparator();
+        System.out.println("1. Add another product" + System.lineSeparator() +
+                "2. Print shopping List" + System.lineSeparator() +
+                "3. Return to Main menu" + System.lineSeparator());
+
+        String menuNumber = sc.nextLine();
+        int number = Integer.parseInt(menuNumber);
+        subMenuSelection(number, shoppingList);
+
+        mainMenu();
+
+    }
+
+    public static void subMenuSelection(int menuNumber, ShoppingList shoppingList) {
+
+        if (menuNumber == 1) {
+            selectProductCategoryMenu(shoppingList);
+        }
+        if (menuNumber == 2) {
+            printShoppingList(shoppingList.getListId());
+        }
+        if (menuNumber == 3) {
+            mainMenu();
+        }
+
+    }
+
+    public static void getLists() {
+
+
+        for (ShoppingList shoppingList : SHOPPING_LISTS) {
+            System.out.println("" + shoppingList.getListId() + "." + shoppingList.toString());
+
+        }
+        System.out.println(System.lineSeparator() + "Select list to edit:");
+
+        String menuNumber = sc.nextLine();
+        int listId = Integer.parseInt(menuNumber);
+
+        //printShoppingList(number);
+
+        //System.out.println("Select entry to edit:");
+
+        // String entryId = sc.nextLine();
+
+        System.out.println("1. Add product to list" + System.lineSeparator() +
+                "2. Update list" + System.lineSeparator() +
+                "3. Delete List");
+
+        String nextMenu = sc.nextLine();
+        int nextMenuChoice = Integer.parseInt(nextMenu);
+
+        if (nextMenuChoice == 1) {
+            selectProductCategoryMenu(SHOPPING_LISTS.get(listId - 1));
+        }
+        if (nextMenuChoice == 2) {
+            printShoppingList(listId);
+            System.out.println("Select entry to edit:");
+            String entryNumber = sc.nextLine();
+            int entryId = Integer.parseInt(menuNumber);
+            System.out.println("1. Update List Name" + System.lineSeparator() +
+                    "2. Update Product Name" + System.lineSeparator() +
+                    "3. Delete list Entry " + System.lineSeparator());
+
+            if (nextMenuChoice == 3) {
+                System.out.println("1. Delete List" + System.lineSeparator() +
+                        "2. Update Product Properties" + System.lineSeparator());
+            }
+
+            System.out.println("Select entry to edit:");
+            int entryID = Integer.parseInt(sc.nextLine());
+        }
 
     }
 
     public static void menuSelection(int menuNumber) {
+
         if (menuNumber == 1) {
-            System.out.println("List of all grocery items: " + System.lineSeparator());
-            displayItems(items);
-            mainMenu();
+            createShoppingList();
         }
         if (menuNumber == 2) {
-            System.out.println("List of your favorites: " + System.lineSeparator());
-            displayItems(favorites);
-            mainMenu();
-        }
-        if (menuNumber == 3) {
-            displayAllLists(shoppingLists);
-            mainMenu();
-        }
-        if (menuNumber == 4) {
-            loadAddProductMenu();
+            getLists();
         }
 
 
     }
 
-    public static void newShoppingList() {
-        List<Product> newList = new ArrayList<>();
+    public static void printShoppingList(int shoppingListID) {
+        double finalCost = 0.00;
 
-
-    }
-
-    public static void loadAddProductMenu() {
-        List<Product> newList = new ArrayList<>();
-        Product returnedProduct = null;
-
-        String prompt = "";
-
-        while (prompt == "") {
-            System.out.println("Add to shopping list: ");
-            System.out.println(
-                    "1. Choose from all products" + System.lineSeparator() +
-                            "2. Choose from favorite products" + System.lineSeparator() +
-                            "3. Add new products");
-            if (newList.size() > 0) {
-                System.out.println("4. Print shopping list. List contains " + newList.size() + " items." + System.lineSeparator());
-
-            }
-
-            String menuNumber = sc.nextLine();
-
-            if (Integer.parseInt(menuNumber) == 3) {
-                // String prompt = "";
-                //while (!prompt.equalsIgnoreCase("n")) {
-                System.out.println("Please enter product number: ");
-                System.out.println(
-                        "1. Produce" + System.lineSeparator() +
-                                "2. Meat" + System.lineSeparator() +
-                                "3. Deli" + System.lineSeparator());
-                String number = sc.nextLine();
-
-                returnedProduct = loadProduct(Integer.parseInt(number));
-                //add to current shopping list
-                newList.add(returnedProduct);
-                //add to all items
-                items.add(returnedProduct);
-
-            }
-            if (Integer.parseInt(menuNumber) == 4) {
-                displayList(newList);
-                prompt = "done";
-
+        for (ListEntry listEntry : LIST_ENTRIES) {
+            if (listEntry.getListId() == shoppingListID) {
+                System.lineSeparator();
+                System.out.println(listEntry.toString());
+                finalCost = finalCost + listEntry.getTotal();
             }
         }
-
-        shoppingLists.add(newList);
-
-
-
-        System.out.println("Select 0 to return to main menu");
-
-        String next = sc.nextLine();
-
-        int nextInt = Integer.parseInt(next);
-
-        if (nextInt == 0) {
-            mainMenu();
-
-        }
-
+        System.out.println("Your list total is $" + finalCost + System.lineSeparator());
 
     }
 
-    public static void loadFav(Product favProduct) {
 
-        System.out.println("Add item to your favorites list? Y/N");
+    public static void mapToListEntries(String quantity, String cost, ListEntry listEntry, ShoppingList
+            shoppingList, org.example.Model.Product product) {
 
-        String addToFavorites = sc.nextLine().toLowerCase();
-        if (addToFavorites.equalsIgnoreCase("y")) {
-            favorites.add(favProduct);
-        }
-
+        listEntry.setListId(shoppingList.getListId());
+        listEntry.setProductId(product.getProductId());
+        listEntry.setQuantity(Integer.parseInt(quantity));
+        listEntry.setCost(Double.parseDouble(cost));
+        listEntry.setProductName(product.getProductName());
+        listEntry.setCategory("Produce");
+        LIST_ENTRIES.add(listEntry);
+        listEntry.setListEntryId(LIST_ENTRIES.size());
 
     }
 
-    public static Product loadProduct(int productNumber) {
-        Product product = null;
-
+    public static void loadProductData(int productNumber, ShoppingList shoppingList) {
+        ListEntry listEntry = new ListEntry();
         if (productNumber == 1) {
             System.out.println("What is the produce name:");
             String name = sc.nextLine();
@@ -154,12 +217,13 @@ public class Main {
             System.out.println("What is the cost per lb.:");
             String cost = sc.nextLine();
 
-            Produce produce = new Produce(name, Integer.parseInt(quantity),
-                    Double.parseDouble(cost));
+            org.example.Model.Product product = new org.example.Model.Product(name);
+            PRODUCTS.add(product);
+            //set to size to emultate serial
 
-            product = produce;
-            loadFav(produce);
-            //shoppingList.add(produce);
+            product.setProductId(PRODUCTS.size());
+            mapToListEntries(quantity, cost, listEntry, shoppingList, product);
+
         }
         if (productNumber == 2) {
             System.out.println("What is the meat name:");
@@ -169,14 +233,14 @@ public class Main {
             System.out.println("What is the cost per lb.:");
             String cost = sc.nextLine();
 
-            Meat meat = new Meat(name, Integer.parseInt(quantity),
-                    Double.parseDouble(cost));
+            org.example.Model.Product product = new org.example.Model.Product(name);
+            PRODUCTS.add(product);
+            //set to size to emultate serial
 
-            product = meat;
-            //ask to add to favs
-            loadFav(meat);
+            product.setProductId(PRODUCTS.size());
+            mapToListEntries(quantity, cost, listEntry, shoppingList, product);
 
-            shoppingList.add(meat);
+
         }
         if (productNumber == 3) {
             System.out.println("What is the deli product name:");
@@ -190,26 +254,14 @@ public class Main {
 
             String slice = sc.nextLine();
 
-            Deli deli = new Deli(name, Integer.parseInt(quantity),
-                    Double.parseDouble(cost), slice);
+            org.example.Model.Product product = new org.example.Model.Product(name);
+            PRODUCTS.add(product);
+            //set to size to emultate serial
+            listEntry.setSlice(slice);
 
-            product = deli;
+            product.setProductId(PRODUCTS.size());
+            mapToListEntries(quantity, cost, listEntry, shoppingList, product);
 
-            loadFav(deli);
-
-            shoppingList.add(deli);
-        }
-
-        return product;
-
-
-    }
-
-    public static void loadQuantity(int productNumber) {
-        Produce produce = new Produce();
-        if (productNumber == 1) {
-            System.out.println("What is the quantity name:");
-            int q = sc.nextInt();
         }
 
 
@@ -219,7 +271,7 @@ public class Main {
     public static void displayList(List<Product> products) {
         System.out.println("Your shopping list!: " + System.lineSeparator());
 
-        double finalCost = 0.0;
+        double finalCost = 0.00;
         for (Product product : products) {
 
             System.out.println(product.toString());
@@ -256,8 +308,9 @@ public class Main {
 
         double finalCost = 0.0;
         for (Product product : products) {
-            System.out.println("" + product.getProductName() + " | " + product.getQuantity() +
-                    " | " + product.getCost());
+            System.out.println("" + product.getProductName() + " | "
+                    + product.getQuantity() + "lbs"
+                    + " | $" + product.getCost());
             // System.out.println(product.toString());
 
         }
