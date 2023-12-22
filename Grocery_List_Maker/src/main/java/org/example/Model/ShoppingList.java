@@ -6,18 +6,19 @@ public class ShoppingList {
 
     private int listId;
 
-    private String listName;
+   // private String listName;
 
     private LocalDate date;
 
 
-    public ShoppingList(String listName) {
-        this.listName = listName;
+    public ShoppingList(LocalDate date){
+        //this.listName = listName;
+        this.date = date;
     }
 
-    public void setListName(String listName) {
-        this.listName = listName;
-    }
+   // public void setListName(String listName) {
+   //     this.listName = listName;
+   // }
 
     public void setListId(int listId) {
         this.listId = listId;
@@ -27,9 +28,9 @@ public class ShoppingList {
         return listId;
     }
 
-    public String getListName() {
-        return listName;
-    }
+  //  public String getListName() {
+   //     return listName;
+   // }
 
     public LocalDate getDate() {
         return date;
@@ -37,6 +38,6 @@ public class ShoppingList {
 
     @Override
     public String toString() {
-        return listName;
+        return  " " +  date;
     }
 }

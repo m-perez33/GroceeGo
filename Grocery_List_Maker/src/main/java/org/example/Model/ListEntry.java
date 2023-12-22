@@ -8,13 +8,13 @@ public class ListEntry {
 
     private int productId;
 
-    private int quantity;
+    private double quantity;
 
     private double cost;
 
     private  String slice;
 
-    private String category;
+    private int category;
 
     private String productName;
     //pull from join
@@ -23,10 +23,10 @@ public class ListEntry {
 
     public ListEntry() {
     }
-    public void setCategory(String category) {
+    public void setCategory(int category) {
         this.category = category;
     }
-    public void setQuantity(int quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
 
@@ -58,7 +58,7 @@ public class ListEntry {
         return productName;
     }
 
-    public String getCategory() {
+    public int getCategory() {
         return category;
     }
     public int getListEntryId() {
@@ -73,7 +73,7 @@ public class ListEntry {
         return productId;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
@@ -91,10 +91,21 @@ public class ListEntry {
 
     @Override
     public String toString() {
+        //if statemtnt to print differntly depending on product category
 
-        return listEntryId + "." +"Product: " + productName + System.lineSeparator() +
-                "Quantity: " + quantity + " lbs" + System.lineSeparator() +
-                "Cost per pound: " + cost + System.lineSeparator() +
-                "Total cost: $" + getTotal() + System.lineSeparator()  ;
+        if(category == 1){
+            return  "ID: " + listEntryId + ". " + System.lineSeparator() +"Product: " + productName + System.lineSeparator() +
+                    "Quantity: " + quantity + " lbs" + System.lineSeparator() +
+                    "Cost per pound: " + cost + System.lineSeparator() +
+                    "Total cost: $" + getTotal() + System.lineSeparator()  ;
+        }else{
+            return  "ID: " +listEntryId + ". " + System.lineSeparator() + "Product: " + productName + System.lineSeparator() +
+                    "Quantity: " + quantity + System.lineSeparator() +
+                    "Cost per item: " + cost + System.lineSeparator() +
+                    "Total cost: $" + getTotal() + System.lineSeparator()  ;
+
+        }
+
+
     }
 }
