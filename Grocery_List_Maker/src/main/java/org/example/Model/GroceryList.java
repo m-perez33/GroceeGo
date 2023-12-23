@@ -2,7 +2,7 @@ package org.example.Model;
 
 import java.time.LocalDate;
 
-public class ShoppingList {
+public class GroceryList {
 
     private int listId;
 
@@ -11,9 +11,13 @@ public class ShoppingList {
     private LocalDate date;
 
 
-    public ShoppingList(LocalDate date){
+    public GroceryList(LocalDate date){
         //this.listName = listName;
         this.date = date;
+    }
+
+    public GroceryList(){
+
     }
 
    // public void setListName(String listName) {
@@ -36,8 +40,12 @@ public class ShoppingList {
         return date;
     }
 
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
-        return  " " +  date;
+        return   " " + listId + " " + date;
     }
 }

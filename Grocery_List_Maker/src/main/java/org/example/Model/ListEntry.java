@@ -94,7 +94,7 @@ public class ListEntry {
         //if statemtnt to print differntly depending on product category
 
         if(category == 1){
-            return  "ID: " + listEntryId + ". " + System.lineSeparator() +"Product: " + productName + System.lineSeparator() +
+            return "ID: " + listEntryId + ". " + System.lineSeparator() +"Product: " + productName + System.lineSeparator() +
                     "Quantity: " + quantity + " lbs" + System.lineSeparator() +
                     "Cost per pound: " + cost + System.lineSeparator() +
                     "Total cost: $" + getTotal() + System.lineSeparator()  ;
