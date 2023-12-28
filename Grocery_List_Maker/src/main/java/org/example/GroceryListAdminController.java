@@ -1,54 +1,53 @@
 package org.example;
 
-import org.example.DAO.*;
+import org.example.DAO.GroceryListDao;
+import org.example.DAO.ListEntryDao;
+import org.example.DAO.ProductDao;
+import org.example.Model.GroceryList;
 import org.example.Model.ListEntry;
 import org.example.Model.Product;
-import org.example.Model.GroceryList;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+public class GroceryListAdminController {
 
-public class Main {
+    private GroceryListDao groceryListDao;
 
+    private ListEntryDao listEntryDao;
 
-   /* private static final List<GroceryList> GROCERY_LISTS = new ArrayList<>();
+    private ProductDao productDao;
+    private static final List<GroceryList> GROCERY_LISTS = new ArrayList<>();
     private static final List<Product> PRODUCTS = new CopyOnWriteArrayList<>();
     private static final List<ListEntry> LIST_ENTRIES = new CopyOnWriteArrayList<>();
-    private static final Scanner sc = new Scanner(System.in);*/
+    private static final Scanner sc = new Scanner(System.in);
+
+    public GroceryListAdminController(GroceryListDao groceryListDao, ListEntryDao listEntryDao, ProductDao productDao) {
+        this.groceryListDao = groceryListDao;
+        this.listEntryDao = listEntryDao;
+        this.productDao = productDao;
+    }
+
 
     // private GroceryListDao groceryListDao;
 
-    public static void main(String[] args) {
+    public void displayMain() {
 
-        // private static GroceryListDao groceryListDao;
-
-
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/GroceryListDB");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("postgres1");
-
-        GroceryListDao groceryListDao = new JdbcGroceryListDao(dataSource);
-        ListEntryDao listEntryDao = new JdbcListEntryDao(dataSource);
-        ProductDao productDao = new JdbcProductDao(dataSource);
 
         System.lineSeparator();
-        // mainMenu(groceryListDao);
-        GroceryListAdminController controller = new GroceryListAdminController(groceryListDao, listEntryDao, productDao);
-        controller.displayMain();
+        mainMenu();
+
     }
 
-}
-/*
-
-    public static void mainMenu(GroceryListDao groceryListDao) {
+    public void mainMenu() {
 
         if (GROCERY_LISTS.size() == 0) {//if no grocery lists immediately load create list product menu
             System.out.println("Create new grocery list" + System.lineSeparator());
-            createGroceryList(groceryListDao);
+            createGroceryList();
 
         } else {//otherwise give options
             System.out.println("1. Create new grocery list");
@@ -56,36 +55,37 @@ public class Main {
             System.out.println("Please make your selection: ");
 
             String menuNumber = sc.nextLine();
-            mainMenuSelection(Integer.parseInt(menuNumber), groceryListDao);
+            mainMenuSelection(Integer.parseInt(menuNumber));
         }
     }
 
-    public static void mainMenuSelection(int menuNumber, GroceryListDao groceryListDao) {
+    public void mainMenuSelection(int menuNumber) {
         if (menuNumber == 1) {
-            createGroceryList(groceryListDao);
+            createGroceryList();
         }
         if (menuNumber == 2) {
             getLists();
         }
     }
 
-    public static void createGroceryList(GroceryListDao groceryListDao) {
+    public void createGroceryList() {
         //create list
 
-       //groceryListDao.createGrocery();
+        //groceryListDao.createGrocery();
         LocalDate date = LocalDate.now();
 
         GroceryList groceryList = new GroceryList(date);
-        groceryListDao.createGrocery(groceryList);
+        GroceryList createdList = groceryListDao.createGrocery(groceryList);
 
-        GROCERY_LISTS.add(groceryList);
+
+        GROCERY_LISTS.add(createdList);
 
         //temp to set list ids. can pull from dao later
         groceryList.setListId(GROCERY_LISTS.indexOf(groceryList) + 1);
-        addProductMenu(groceryList);
+        addProductMenu(createdList);
     }
 
-    public static void addProductMenu(GroceryList groceryList) {
+    public void addProductMenu(GroceryList groceryList) {
 
         System.lineSeparator();
         System.out.println("Please select product category: ");
@@ -98,7 +98,7 @@ public class Main {
         subAddProductMenu(groceryList);
     }
 
-    public static void subAddProductMenu(GroceryList groceryList) {
+    public void subAddProductMenu(GroceryList groceryList) {
         //This menu accepts a grocery list to edit
         System.lineSeparator();
         System.out.println("1. Add another product");
@@ -111,7 +111,7 @@ public class Main {
         mainMenu();
     }
 
-    public static void subMenuSelection(int menuNumber, GroceryList groceryList) {
+    public void subMenuSelection(int menuNumber, GroceryList groceryList) {
 
         if (menuNumber == 1) {
             addProductMenu(groceryList);
@@ -124,7 +124,7 @@ public class Main {
         }
     }
 
-    public static void getLists() {
+    public void getLists() {
 
         int count = 1;
         //print out all of users lists
@@ -140,7 +140,7 @@ public class Main {
         subListMenu(listId);
     }
 
-    public static void listEntryMenu(int listId) {
+    public void listEntryMenu(int listId) {
 
         List<ListEntry> myList = new CopyOnWriteArrayList<>();
 
@@ -186,7 +186,7 @@ public class Main {
         }
     }
 
-    public static void subListMenu(int listId) {
+    public void subListMenu(int listId) {
         System.out.println("1. Add product to list");
         System.out.println("2. Update list");
         System.out.println("3. Delete List");
@@ -209,7 +209,7 @@ public class Main {
         }
     }
 
-    public static void printGroceryList(int groceryListID) {
+    public void printGroceryList(int groceryListID) {
         double finalCost = 0.00;
 
         for (ListEntry listEntry : LIST_ENTRIES) {
@@ -222,7 +222,7 @@ public class Main {
         System.out.println("Your list total is $" + finalCost + System.lineSeparator());
     }
 
-    public static void mapToListEntries(String quantity, String cost, ListEntry listEntry, GroceryList
+    public void mapToListEntries(String quantity, String cost, ListEntry listEntry, GroceryList
             groceryList, Product product, int category) {
 
         listEntry.setListId(groceryList.getListId());
@@ -230,23 +230,33 @@ public class Main {
         listEntry.setQuantity(Double.parseDouble(quantity));
         listEntry.setCost(Double.parseDouble(cost));
         listEntry.setProductName(product.getProductName());
-        listEntry.setCategory(category);
+        //listEntry.setCategory(category);
 
         LIST_ENTRIES.add(listEntry);
         listEntry.setListEntryId(LIST_ENTRIES.size());
         System.out.println("its working");
     }
 
-    public static void addNewProduct(String name, String quantity, String cost, ListEntry listEntry,
-                                     GroceryList groceryList, int productNumber) {
+    public void addNewProduct(String name, String quantity, String cost, ListEntry listEntry,
+                              GroceryList groceryList, int productNumber) {
 
         Product newProduct = new Product(name);
+        Product createdProduct = productDao.createProduct(newProduct);
+        System.out.println(createdProduct.getProductName() + " " +createdProduct.getProductId());
         newProduct.setProductId(PRODUCTS.size() + 1);
         PRODUCTS.add(newProduct);
+
+        ListEntry newEntry = new ListEntry();
+        newEntry.setProductId(createdProduct.getProductId());
+        newEntry.setListId(groceryList.getListId());
+        newEntry.setCost(Double.parseDouble(cost));
+        newEntry.setQuantity(Double.parseDouble(quantity));
+        listEntryDao.createListEntry(newEntry);
+
         mapToListEntries(quantity, cost, listEntry, groceryList, newProduct, productNumber);
     }
 
-    public static void loadProductData(int productNumber, GroceryList groceryList) {
+    public void loadProductData(int productNumber, GroceryList groceryList) {
         //these promps set the values for a list entry and add to list entry list
 
         ListEntry listEntry = new ListEntry();
@@ -263,8 +273,10 @@ public class Main {
                 //Product newProduct = null;
                 for (Product product : PRODUCTS) {
                     if (product.getProductName().equalsIgnoreCase(name)) {
+
                         mapToListEntries(quantity, cost, listEntry, groceryList, product, productNumber);
                     } else {
+
                         addNewProduct(name, quantity, cost, listEntry, groceryList, productNumber);
                     }
                 }
@@ -298,4 +310,6 @@ public class Main {
             }
         }
     }
-}*/
+}
+
+

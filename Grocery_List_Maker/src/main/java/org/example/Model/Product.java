@@ -8,6 +8,7 @@ public class Product {
 
     public Product(String productName) {
         this.productName = productName;
+
     }
 
     public Product(){

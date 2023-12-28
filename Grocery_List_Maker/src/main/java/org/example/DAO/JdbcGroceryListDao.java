@@ -8,12 +8,18 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import javax.sql.DataSource;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcGroceryListDao implements GroceryListDao{
 
     private JdbcTemplate jdbcTemplate;
+
+    public JdbcGroceryListDao (DataSource dataSource){
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
 
     @Override
     public List<GroceryList> getGroceryLists() {
@@ -52,8 +58,8 @@ public class JdbcGroceryListDao implements GroceryListDao{
 
     @Override
     public GroceryList createGrocery(GroceryList groceryList) {
-        GroceryList newGroceryList = null;
-        String sql = "INSERT INTO grocery_list (created_date)) VALUES (?) RETURNING id";
+       GroceryList newGroceryList = null;
+        String sql = "INSERT INTO grocery_list (created_date) VALUES (?) RETURNING grocery_list_id";
         try {
             int glID = jdbcTemplate.queryForObject(sql, int.class, groceryList.getDate());
             newGroceryList = getGroceryListById(glID);

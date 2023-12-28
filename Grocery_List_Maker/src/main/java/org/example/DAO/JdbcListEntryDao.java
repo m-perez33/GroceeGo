@@ -8,12 +8,18 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcListEntryDao implements ListEntryDao {
 
     private JdbcTemplate jdbcTemplate;
+
+    public JdbcListEntryDao (DataSource dataSource){
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
     @Override
     public List<ListEntry> getListEntries() {
         List<ListEntry> listEntries = new ArrayList<>();
@@ -53,9 +59,9 @@ public class JdbcListEntryDao implements ListEntryDao {
     @Override
     public ListEntry createListEntry(ListEntry listEntry) {
         ListEntry newListEntry = null;
-        String sql = "INSERT INTO list_entry (quantity, cost, grocery_list_id, product_id )) VALUES (?,?,?,?) RETURNING id";
+        String sql = "INSERT INTO list_entry (quantity, cost, grocery_list_id, product_id ) VALUES (?,?,?,?) RETURNING list_entry_id";
         try {
-            int leID = jdbcTemplate.queryForObject(sql, int.class, listEntry.getQuantity(),listEntry.getListEntryId(),listEntry.getListId(), listEntry.getProductId());
+            int leID = jdbcTemplate.queryForObject(sql, int.class, listEntry.getQuantity(),listEntry.getCost(), listEntry.getListId(), listEntry.getProductId());
             newListEntry = getListEntryById(leID);
         } catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Unable to connect to server or database", e);

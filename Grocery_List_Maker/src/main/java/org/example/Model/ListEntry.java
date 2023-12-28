@@ -23,6 +23,14 @@ public class ListEntry {
 
     public ListEntry() {
     }
+
+    public ListEntry(int listId, int productId, double quantity, double cost) {
+        this.listId = listId;
+        this.productId = productId;
+        this.quantity = quantity;
+        this.cost = cost;
+    }
+
     public void setCategory(int category) {
         this.category = category;
     }
