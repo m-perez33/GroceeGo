@@ -1,7 +1,6 @@
 package org.example.DAO;
 
 import org.example.Exception.DaoException;
-import org.example.Model.GroceryList;
 import org.example.Model.ListEntry;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -23,7 +22,9 @@ public class JdbcListEntryDao implements ListEntryDao {
     @Override
     public List<ListEntry> getListEntries() {
         List<ListEntry> listEntries = new ArrayList<>();
-        String sql = "SELECT * FROM list_entry ";
+        String sql = "SELECT cost, quantity, list_entry_id, l.product_id, grocery_list_id, name \n" +
+                "FROM list_entry l\n" +
+                "JOIN product p ON p.product_id = l.product_id ";
 
         try{
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
@@ -38,11 +39,34 @@ public class JdbcListEntryDao implements ListEntryDao {
         return listEntries;
     }
 
+    @Override
+    public List<ListEntry> getListEntriesByListId(int id) {
+        List<ListEntry> listEntries = new ArrayList<>();
+        String sql = "SELECT cost, quantity, list_entry_id, l.product_id, grocery_list_id, name \n" +
+                "FROM list_entry l\n" +
+                "JOIN product p ON p.product_id = l.product_id " +
+                "WHERE grocery_list_id = ? ";
+
+        try{
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
+            while (results.next()){
+                ListEntry entry = mapRowToEntry(results);
+                listEntries.add(entry);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        }
+
+        return listEntries;
+    }
 
     @Override
     public ListEntry getListEntryById(int id) {
         ListEntry listEntry = null;
-        String sql = "SELECT * FROM list_entry WHERE list_entry_id = ?";
+        String sql = "SELECT cost, quantity, list_entry_id, l.product_id, grocery_list_id, name \n" +
+                "FROM list_entry l\n" +
+                "JOIN product p ON p.product_id = l.product_id " +
+                "WHERE list_entry_id = ? ";
 
         try{
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
@@ -55,6 +79,8 @@ public class JdbcListEntryDao implements ListEntryDao {
 
         return listEntry;
     }
+
+
 
     @Override
     public ListEntry createListEntry(ListEntry listEntry) {
@@ -74,7 +100,7 @@ public class JdbcListEntryDao implements ListEntryDao {
     @Override
     public ListEntry updatelistEntry(ListEntry listEntry) {
         ListEntry updatedEntry = null;
-        String sql = "UPDATE list_entry SET quantity = ?, cost = ?, WHERE list_entry_id = ?";
+        String sql = "UPDATE list_entry SET quantity = ?, cost = ? WHERE list_entry_id = ?";
         try {
             int rowsAffected = jdbcTemplate.update(sql, listEntry.getQuantity(), listEntry.getCost(), listEntry.getListEntryId());
             if (rowsAffected == 0) {
@@ -109,6 +135,8 @@ public class JdbcListEntryDao implements ListEntryDao {
         le.setCost(rs.getDouble("cost"));
         le.setListId(rs.getInt("grocery_list_id"));
         le.setProductId(rs.getInt("product_id"));
+        le.setProductName(rs.getString("name"));
+        le.setListEntryId(rs.getInt("list_entry_id"));
         return le;
     }
 }

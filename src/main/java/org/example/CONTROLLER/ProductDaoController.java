@@ -1,2 +1,4 @@
-package org.example.CONTROLLER;public class ProductDaoController {
+package org.example.CONTROLLER;
+
+public class ProductDaoController {
 }

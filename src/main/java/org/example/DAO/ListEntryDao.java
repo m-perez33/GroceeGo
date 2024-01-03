@@ -8,6 +8,8 @@ public interface ListEntryDao {
 
     List<ListEntry> getListEntries();
 
+    List<ListEntry> getListEntriesByListId(int id);
+
     ListEntry getListEntryById(int id);
 
     ListEntry createListEntry(ListEntry listEntry);

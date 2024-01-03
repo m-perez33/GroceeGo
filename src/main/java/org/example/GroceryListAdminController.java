@@ -45,7 +45,7 @@ public class GroceryListAdminController {
 
     public void mainMenu() {
 
-        if (GROCERY_LISTS.size() == 0) {//if no grocery lists immediately load create list product menu
+        if (groceryListDao.getGroceryLists().size() == 0) {//if no grocery lists immediately load create list product menu
             System.out.println("Create new grocery list" + System.lineSeparator());
             createGroceryList();
 
@@ -126,9 +126,10 @@ public class GroceryListAdminController {
 
     public void getLists() {
 
+        List<GroceryList> groceryLists = groceryListDao.getGroceryLists();
         int count = 1;
         //print out all of users lists
-        for (GroceryList groceryList : GROCERY_LISTS) {
+        for (GroceryList groceryList : groceryLists) {
             System.out.println("" + count + ". " + "Grocery List " + count + groceryList.toString());
             count++;
         }
@@ -144,11 +145,16 @@ public class GroceryListAdminController {
 
         List<ListEntry> myList = new CopyOnWriteArrayList<>();
 
-        for (ListEntry listEntry : LIST_ENTRIES) {//loop through and print entries tied to list id
-            if (listEntry.getListId() == listId) {
+        List<ListEntry> listEntries = listEntryDao.getListEntries();
+
+        List<ListEntry> listEntriesByID = listEntryDao.getListEntriesByListId(listId);
+
+
+        for (ListEntry listEntry : listEntriesByID) {//loop through and print entries tied to list id
+           // if (listEntry.getListId() == listId) {
                 System.out.println("" + "." + listEntry.toString());
-                myList.add(listEntry);
-            }
+                //myList.add(listEntry);
+          //  }
         }
 
         System.out.println("Enter ID to edit:");
@@ -162,7 +168,7 @@ public class GroceryListAdminController {
         int menuChoice = Integer.parseInt(listMenuNumber);
 
         if (menuChoice == 1) {
-            for (ListEntry listEntry : myList) {
+            for (ListEntry listEntry : listEntriesByID) {
                 if (listEntry.getListEntryId() == entryId) {
                     System.out.println("Please update product properties for: " + listEntry.getProductName());
                     System.out.println("Enter new quantity and cost, separated by comma ex: 10,9: ");
@@ -171,13 +177,17 @@ public class GroceryListAdminController {
                     listEntry.setQuantity(Double.parseDouble(updates.get(0)));
                     listEntry.setCost(Double.parseDouble(updates.get(1)));
 
-                    System.out.println("Updated value:" + listEntry.toString());
+                    ListEntry updatedEntry = listEntryDao.updatelistEntry(listEntry);
+                    System.out.println("Updated value:" + updatedEntry.toString());
                 }
             }
         }
         if (menuChoice == 2) {
-            for (ListEntry listEntry : myList) {
+            for (ListEntry listEntry : listEntriesByID) {
                 if (listEntry.getListEntryId() == entryId) {
+
+                    listEntryDao.deleteListEntry(entryId);
+
                     LIST_ENTRIES.remove(listEntry);
                     System.out.println("List Entry deleted");//return to entry menu
                     mainMenu();
@@ -193,16 +203,22 @@ public class GroceryListAdminController {
 
         String nextMenu = sc.nextLine();
         int nextMenuChoice = Integer.parseInt(nextMenu);
+        List<GroceryList> retrievedLists = groceryListDao.getGroceryLists();
 
         if (nextMenuChoice == 1) { //if 1 go and add more products to the list
-            addProductMenu(GROCERY_LISTS.get(listId - 1));
+            addProductMenu(groceryListDao.getGroceryListById(listId));
         }
         if (nextMenuChoice == 2) { //print out all list entries for a grocery list
             listEntryMenu(listId);
         }
         if (nextMenuChoice == 3) {
-            System.out.println("3?");
-            GROCERY_LISTS.remove(listId - 1);
+            System.out.println("" + listId);
+            ;
+            for(ListEntry listEntry: listEntryDao.getListEntriesByListId(listId)){
+                listEntryDao.deleteListEntry(listEntry.getListEntryId());
+            }
+            groceryListDao.deleteGroceryList(listId);
+            //GROCERY_LISTS.remove(listId - 1);
             System.out.println("List deleted");
             mainMenu();
             System.out.println();
@@ -212,7 +228,7 @@ public class GroceryListAdminController {
     public void printGroceryList(int groceryListID) {
         double finalCost = 0.00;
 
-        for (ListEntry listEntry : LIST_ENTRIES) {
+        for (ListEntry listEntry : listEntryDao.getListEntries()) {
             if (listEntry.getListId() == groceryListID) {
                 System.lineSeparator();
                 System.out.println(listEntry.toString());
@@ -222,42 +238,38 @@ public class GroceryListAdminController {
         System.out.println("Your list total is $" + finalCost + System.lineSeparator());
     }
 
-    public void mapToListEntries(String quantity, String cost, ListEntry listEntry, GroceryList
+    public void mapToListEntries(String quantity, String cost/*ListEntry listEntry*/, GroceryList
             groceryList, Product product, int category) {
 
-        listEntry.setListId(groceryList.getListId());
-        listEntry.setProductId(product.getProductId());
-        listEntry.setQuantity(Double.parseDouble(quantity));
-        listEntry.setCost(Double.parseDouble(cost));
-        listEntry.setProductName(product.getProductName());
-        //listEntry.setCategory(category);
 
-        LIST_ENTRIES.add(listEntry);
-        listEntry.setListEntryId(LIST_ENTRIES.size());
-        System.out.println("its working");
-    }
-
-    public void addNewProduct(String name, String quantity, String cost, ListEntry listEntry,
-                              GroceryList groceryList, int productNumber) {
-
-        Product newProduct = new Product(name);
-        Product createdProduct = productDao.createProduct(newProduct);
-        System.out.println(createdProduct.getProductName() + " " +createdProduct.getProductId());
-        newProduct.setProductId(PRODUCTS.size() + 1);
-        PRODUCTS.add(newProduct);
 
         ListEntry newEntry = new ListEntry();
-        newEntry.setProductId(createdProduct.getProductId());
+        newEntry.setProductId(product.getProductId());
         newEntry.setListId(groceryList.getListId());
         newEntry.setCost(Double.parseDouble(cost));
         newEntry.setQuantity(Double.parseDouble(quantity));
         listEntryDao.createListEntry(newEntry);
 
-        mapToListEntries(quantity, cost, listEntry, groceryList, newProduct, productNumber);
+
+    }
+
+    public void addNewProduct(String name, String quantity, String cost,
+                              GroceryList groceryList, int productNumber) {
+        // first create product
+        Product newProduct = new Product(name);
+        Product createdProduct = productDao.createProduct(newProduct);
+        //System.out.println(createdProduct.getProductName() + " " +createdProduct.getProductId());
+        newProduct.setProductId(PRODUCTS.size() + 1);
+        PRODUCTS.add(newProduct);
+
+
+
+        mapToListEntries(quantity, cost, groceryList, createdProduct, productNumber);
     }
 
     public void loadProductData(int productNumber, GroceryList groceryList) {
         //these promps set the values for a list entry and add to list entry list
+        List<Product> retrievedProducts = productDao.getProducts();
 
         ListEntry listEntry = new ListEntry();
         if (productNumber == 1) {
@@ -268,21 +280,25 @@ public class GroceryListAdminController {
             System.out.println("What is the cost per lb.:");
             String cost = sc.nextLine();
 
-            if (!PRODUCTS.isEmpty()) {
+            boolean found = false;
 
-                //Product newProduct = null;
-                for (Product product : PRODUCTS) {
+            if (retrievedProducts.size() != 0) {
+                // if products exist, check to see if they match the product being added.
+                //existing product should be used instead of adding another entry to DB
+                for (Product product : retrievedProducts) {
+
                     if (product.getProductName().equalsIgnoreCase(name)) {
-
-                        mapToListEntries(quantity, cost, listEntry, groceryList, product, productNumber);
-                    } else {
-
-                        addNewProduct(name, quantity, cost, listEntry, groceryList, productNumber);
+                        found = true;
+                        System.out.println("true");
+                        mapToListEntries(quantity, cost, groceryList, product, productNumber);
                     }
                 }
-            } else {
-                addNewProduct(name, quantity, cost, listEntry, groceryList, productNumber);
+            } //if empty just add new product
+             if (found == false){
+                addNewProduct(name, quantity, cost, groceryList, productNumber);
             }
+
+
         }
         if (productNumber == 2) {
             System.out.println("What is the product name:");
@@ -298,15 +314,15 @@ public class GroceryListAdminController {
                 for (Product product : PRODUCTS) {
                     if (product.getProductName().equalsIgnoreCase(name)) {
                         System.out.println(product.getProductName());
-                        mapToListEntries(quantity, cost, listEntry, groceryList, product, productNumber);
+                        mapToListEntries(quantity, cost, groceryList, product, productNumber);
 
                     } else {
 
-                        addNewProduct(name, quantity, cost, listEntry, groceryList, productNumber);
+                        addNewProduct(name, quantity, cost, groceryList, productNumber);
                     }
                 }
             } else {
-                addNewProduct(name, quantity, cost, listEntry, groceryList, productNumber);
+                addNewProduct(name, quantity, cost, groceryList, productNumber);
             }
         }
     }
