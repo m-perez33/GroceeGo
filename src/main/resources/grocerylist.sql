@@ -40,6 +40,7 @@ CREATE TABLE list_entry(
 	cost numeric(7,2) NOT NULL,
 	grocery_list_id int NOT NULL,
 	product_id int NOT NULL,
+	category int NOT NULL
 	CONSTRAINT PK_list_entry PRIMARY KEY (list_entry_id),
 	CONSTRAINT FK_grocery_list FOREIGN KEY(grocery_list_id) REFERENCES grocery_list (grocery_list_id)
 	CONSTRAINT FK_product FOREIGN KEY(product_id) REFERENCES product (product_id)

@@ -22,7 +22,7 @@ public class JdbcListEntryDao implements ListEntryDao {
     @Override
     public List<ListEntry> getListEntries() {
         List<ListEntry> listEntries = new ArrayList<>();
-        String sql = "SELECT cost, quantity, list_entry_id, l.product_id, grocery_list_id, name \n" +
+        String sql = "SELECT cost, quantity, list_entry_id, l.product_id, grocery_list_id, name, category \n" +
                 "FROM list_entry l\n" +
                 "JOIN product p ON p.product_id = l.product_id ";
 
@@ -42,7 +42,7 @@ public class JdbcListEntryDao implements ListEntryDao {
     @Override
     public List<ListEntry> getListEntriesByListId(int id) {
         List<ListEntry> listEntries = new ArrayList<>();
-        String sql = "SELECT cost, quantity, list_entry_id, l.product_id, grocery_list_id, name \n" +
+        String sql = "SELECT cost, quantity, list_entry_id, l.product_id, grocery_list_id, name, category \n" +
                 "FROM list_entry l\n" +
                 "JOIN product p ON p.product_id = l.product_id " +
                 "WHERE grocery_list_id = ? ";
@@ -63,7 +63,7 @@ public class JdbcListEntryDao implements ListEntryDao {
     @Override
     public ListEntry getListEntryById(int id) {
         ListEntry listEntry = null;
-        String sql = "SELECT cost, quantity, list_entry_id, l.product_id, grocery_list_id, name \n" +
+        String sql = "SELECT cost, quantity, list_entry_id, l.product_id, grocery_list_id, name, category \n" +
                 "FROM list_entry l\n" +
                 "JOIN product p ON p.product_id = l.product_id " +
                 "WHERE list_entry_id = ? ";
@@ -85,9 +85,9 @@ public class JdbcListEntryDao implements ListEntryDao {
     @Override
     public ListEntry createListEntry(ListEntry listEntry) {
         ListEntry newListEntry = null;
-        String sql = "INSERT INTO list_entry (quantity, cost, grocery_list_id, product_id ) VALUES (?,?,?,?) RETURNING list_entry_id";
+        String sql = "INSERT INTO list_entry (quantity, cost, grocery_list_id, product_id, category ) VALUES (?,?,?,?,?) RETURNING list_entry_id";
         try {
-            int leID = jdbcTemplate.queryForObject(sql, int.class, listEntry.getQuantity(),listEntry.getCost(), listEntry.getListId(), listEntry.getProductId());
+            int leID = jdbcTemplate.queryForObject(sql, int.class, listEntry.getQuantity(),listEntry.getCost(), listEntry.getListId(), listEntry.getProductId(), listEntry.getCategory());
             newListEntry = getListEntryById(leID);
         } catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Unable to connect to server or database", e);
@@ -136,6 +136,7 @@ public class JdbcListEntryDao implements ListEntryDao {
         le.setListId(rs.getInt("grocery_list_id"));
         le.setProductId(rs.getInt("product_id"));
         le.setProductName(rs.getString("name"));
+        le.setCategory(rs.getInt("category"));
         le.setListEntryId(rs.getInt("list_entry_id"));
         return le;
     }

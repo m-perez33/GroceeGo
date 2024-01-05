@@ -200,6 +200,7 @@ public class GroceryListAdminController {
         System.out.println("1. Add product to list");
         System.out.println("2. Update list");
         System.out.println("3. Delete List");
+        System.out.println("4. Print List");
 
         String nextMenu = sc.nextLine();
         int nextMenuChoice = Integer.parseInt(nextMenu);
@@ -222,6 +223,10 @@ public class GroceryListAdminController {
             System.out.println("List deleted");
             mainMenu();
             System.out.println();
+        }
+        if(nextMenuChoice == 4){
+            printGroceryList(listId);
+
         }
     }
 
@@ -248,6 +253,7 @@ public class GroceryListAdminController {
         newEntry.setListId(groceryList.getListId());
         newEntry.setCost(Double.parseDouble(cost));
         newEntry.setQuantity(Double.parseDouble(quantity));
+        newEntry.setCategory(category);
         listEntryDao.createListEntry(newEntry);
 
 
@@ -267,12 +273,12 @@ public class GroceryListAdminController {
         mapToListEntries(quantity, cost, groceryList, createdProduct, productNumber);
     }
 
-    public void loadProductData(int productNumber, GroceryList groceryList) {
+    public void loadProductData(int category, GroceryList groceryList) {
         //these promps set the values for a list entry and add to list entry list
         List<Product> retrievedProducts = productDao.getProducts();
 
         ListEntry listEntry = new ListEntry();
-        if (productNumber == 1) {
+        if (category == 1) {
             System.out.println("What is the product name:");
             String name = sc.nextLine();
             System.out.println("What is the quantity in lbs:");
@@ -290,17 +296,17 @@ public class GroceryListAdminController {
                     if (product.getProductName().equalsIgnoreCase(name)) {
                         found = true;
                         System.out.println("true");
-                        mapToListEntries(quantity, cost, groceryList, product, productNumber);
+                        mapToListEntries(quantity, cost, groceryList, product, category);
                     }
                 }
             } //if empty just add new product
              if (found == false){
-                addNewProduct(name, quantity, cost, groceryList, productNumber);
+                addNewProduct(name, quantity, cost, groceryList, category);
             }
 
 
         }
-        if (productNumber == 2) {
+        if (category == 2) {
             System.out.println("What is the product name:");
             String name = sc.nextLine();
             System.out.println("What is the quantity:");
@@ -309,20 +315,22 @@ public class GroceryListAdminController {
             String cost = sc.nextLine();
 
             //Product newProduct = new Product();
-            if (!PRODUCTS.isEmpty()) {
+            boolean found = false;
 
-                for (Product product : PRODUCTS) {
+            if (retrievedProducts.size() != 0) {
+                // if products exist, check to see if they match the product being added.
+                //existing product should be used instead of adding another entry to DB
+                for (Product product : retrievedProducts) {
+
                     if (product.getProductName().equalsIgnoreCase(name)) {
-                        System.out.println(product.getProductName());
-                        mapToListEntries(quantity, cost, groceryList, product, productNumber);
-
-                    } else {
-
-                        addNewProduct(name, quantity, cost, groceryList, productNumber);
+                        found = true;
+                        System.out.println("true");
+                        mapToListEntries(quantity, cost, groceryList, product, category);
                     }
                 }
-            } else {
-                addNewProduct(name, quantity, cost, groceryList, productNumber);
+            } //if empty just add new product
+            if (found == false){
+                addNewProduct(name, quantity, cost, groceryList, category);
             }
         }
     }
