@@ -5,6 +5,7 @@ import org.example.Model.ListEntry;
 import org.example.Model.Product;
 import org.example.Model.GroceryList;
 
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -21,7 +22,7 @@ public class Main {
 
     // private GroceryListDao groceryListDao;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
 
         // private static GroceryListDao groceryListDao;
 

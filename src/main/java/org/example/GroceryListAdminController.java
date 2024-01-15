@@ -6,6 +6,9 @@ import org.example.DAO.ProductDao;
 import org.example.Model.GroceryList;
 import org.example.Model.ListEntry;
 import org.example.Model.Product;
+import org.example.Services.GroceryListService;
+import org.example.Services.ListEntryService;
+import org.example.Services.ProductService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,6 +19,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GroceryListAdminController {
 
+    private GroceryListService groceryListService = new GroceryListService();
+
+    private ListEntryService listEntryService = new ListEntryService();
+
+    private ProductService productService = new ProductService();
     private GroceryListDao groceryListDao;
 
     private ListEntryDao listEntryDao;
@@ -34,7 +42,10 @@ public class GroceryListAdminController {
 
 
     // private GroceryListDao groceryListDao;
+private void handleGroceryLists(){
+        groceryListService.getGroceryLists();
 
+}
     public void displayMain() {
 
 
@@ -44,8 +55,9 @@ public class GroceryListAdminController {
     }
 
     public void mainMenu() {
+        List<GroceryList> groceryLists = groceryListService.getGroceryLists();
 
-        if (groceryListDao.getGroceryLists().size() == 0) {//if no grocery lists immediately load create list product menu
+        if (groceryLists.size() == 0) {//if no grocery lists immediately load create list product menu
             System.out.println("Create new grocery list" + System.lineSeparator());
             createGroceryList();
 
@@ -73,15 +85,14 @@ public class GroceryListAdminController {
 
         //groceryListDao.createGrocery();
         LocalDate date = LocalDate.now();
-
         GroceryList groceryList = new GroceryList(date);
-        GroceryList createdList = groceryListDao.createGrocery(groceryList);
+        GroceryList createdList = groceryListService.createGrocery(groceryList);
 
 
-        GROCERY_LISTS.add(createdList);
+        //GROCERY_LISTS.add(createdList);
 
         //temp to set list ids. can pull from dao later
-        groceryList.setListId(GROCERY_LISTS.indexOf(groceryList) + 1);
+      //  groceryList.setListId(GROCERY_LISTS.indexOf(groceryList) + 1);
         addProductMenu(createdList);
     }
 
@@ -126,7 +137,7 @@ public class GroceryListAdminController {
 
     public void getLists() {
 
-        List<GroceryList> groceryLists = groceryListDao.getGroceryLists();
+        List<GroceryList> groceryLists = groceryListService.getGroceryLists();
         int count = 1;
         //print out all of users lists
         for (GroceryList groceryList : groceryLists) {
@@ -145,9 +156,9 @@ public class GroceryListAdminController {
 
         List<ListEntry> myList = new CopyOnWriteArrayList<>();
 
-        List<ListEntry> listEntries = listEntryDao.getListEntries();
+        //List<ListEntry> listEntries = listEntryService.getListEntries();
 
-        List<ListEntry> listEntriesByID = listEntryDao.getListEntriesByListId(listId);
+        List<ListEntry> listEntriesByID = listEntryService.getListEntriesByListId(listId);
 
 
         for (ListEntry listEntry : listEntriesByID) {//loop through and print entries tied to list id
@@ -177,8 +188,13 @@ public class GroceryListAdminController {
                     listEntry.setQuantity(Double.parseDouble(updates.get(0)));
                     listEntry.setCost(Double.parseDouble(updates.get(1)));
 
-                    ListEntry updatedEntry = listEntryDao.updatelistEntry(listEntry);
-                    System.out.println("Updated value:" + updatedEntry.toString());
+                    listEntryService.updateListEntry(listEntry);
+
+
+                    //since its a put request, dont need to retrieve data
+                    //ListEntry updatedEntry = listEntryService.getListEntryById(listEntry.getListEntryId());
+
+                    System.out.println("Updated value:" + listEntry.toString());
                 }
             }
         }
@@ -186,7 +202,7 @@ public class GroceryListAdminController {
             for (ListEntry listEntry : listEntriesByID) {
                 if (listEntry.getListEntryId() == entryId) {
 
-                    listEntryDao.deleteListEntry(entryId);
+                    listEntryService.deleteListEntry(entryId);
 
                     LIST_ENTRIES.remove(listEntry);
                     System.out.println("List Entry deleted");//return to entry menu
@@ -202,12 +218,14 @@ public class GroceryListAdminController {
         System.out.println("3. Delete List");
         System.out.println("4. Print List");
 
+        System.out.println(listId);
         String nextMenu = sc.nextLine();
         int nextMenuChoice = Integer.parseInt(nextMenu);
-        List<GroceryList> retrievedLists = groceryListDao.getGroceryLists();
+        List<GroceryList> retrievedLists = groceryListService.getGroceryLists();
 
         if (nextMenuChoice == 1) { //if 1 go and add more products to the list
-            addProductMenu(groceryListDao.getGroceryListById(listId));
+            addProductMenu(groceryListService.getGroceryListById(listId));
+            System.out.println(groceryListService.getGroceryListById(listId));
         }
         if (nextMenuChoice == 2) { //print out all list entries for a grocery list
             listEntryMenu(listId);
@@ -215,10 +233,10 @@ public class GroceryListAdminController {
         if (nextMenuChoice == 3) {
             System.out.println("" + listId);
             ;
-            for(ListEntry listEntry: listEntryDao.getListEntriesByListId(listId)){
-                listEntryDao.deleteListEntry(listEntry.getListEntryId());
+            for(ListEntry listEntry: listEntryService.getListEntriesByListId(listId)){
+                listEntryService.deleteListEntry(listEntry.getListEntryId());
             }
-            groceryListDao.deleteGroceryList(listId);
+            groceryListService.deleteGroceryList(listId);
             //GROCERY_LISTS.remove(listId - 1);
             System.out.println("List deleted");
             mainMenu();
@@ -233,17 +251,17 @@ public class GroceryListAdminController {
     public void printGroceryList(int groceryListID) {
         double finalCost = 0.00;
 
-        for (ListEntry listEntry : listEntryDao.getListEntries()) {
-            if (listEntry.getListId() == groceryListID) {
+        for (ListEntry listEntry : listEntryService.getListEntriesByListId(groceryListID)) {
+           // if (listEntry.getListId() == groceryListID) {
                 System.lineSeparator();
                 System.out.println(listEntry.toString());
                 finalCost = finalCost + listEntry.getTotal();
-            }
+           // }
         }
         System.out.println("Your list total is $" + finalCost + System.lineSeparator());
     }
 
-    public void mapToListEntries(String quantity, String cost/*ListEntry listEntry*/, GroceryList
+    public void mapToListEntries(String quantity, String cost, GroceryList
             groceryList, Product product, int category) {
 
 
@@ -254,7 +272,7 @@ public class GroceryListAdminController {
         newEntry.setCost(Double.parseDouble(cost));
         newEntry.setQuantity(Double.parseDouble(quantity));
         newEntry.setCategory(category);
-        listEntryDao.createListEntry(newEntry);
+        listEntryService.createListEntry(newEntry);
 
 
     }
@@ -263,7 +281,7 @@ public class GroceryListAdminController {
                               GroceryList groceryList, int productNumber) {
         // first create product
         Product newProduct = new Product(name);
-        Product createdProduct = productDao.createProduct(newProduct);
+        Product createdProduct = productService.createProduct(newProduct);
         //System.out.println(createdProduct.getProductName() + " " +createdProduct.getProductId());
         newProduct.setProductId(PRODUCTS.size() + 1);
         PRODUCTS.add(newProduct);
@@ -275,7 +293,7 @@ public class GroceryListAdminController {
 
     public void loadProductData(int category, GroceryList groceryList) {
         //these promps set the values for a list entry and add to list entry list
-        List<Product> retrievedProducts = productDao.getProducts();
+        List<Product> retrievedProducts = productService.getProducts();
 
         ListEntry listEntry = new ListEntry();
         if (category == 1) {
