@@ -4,18 +4,35 @@
 DROP TABLE IF EXISTS list_entry;
 DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS grocery_list;
+DROP TABLE IF EXISTS users;
 
 
 
+CREATE TABLE users (
+	user_id SERIAL,
+	username varchar(50) NOT NULL UNIQUE,
+	password_hash varchar(200) NOT NULL,
+	role varchar(50) NOT NULL,
+	name varchar(50) NOT NULL,
+	address varchar(100) NULL,
+	city varchar(50) NULL,
+	state_code char(2) NULL,
+	zip varchar(5) NULL,
+	CONSTRAINT PK_user PRIMARY KEY (user_id)
+);
 /**************************************************************************
 -- Step 1: Create the customer table
 **************************************************************************/
 -- Table customer
 CREATE TABLE grocery_list(
 	grocery_list_id serial NOT NULL,
-    created_date DATE NOT NULL DEFAULT CURRENT_DATE
-	CONSTRAINT PK_grocery_list PRIMARY KEY (grocery_list_id)
+	user_id int NULL,--make not null later
+    created_date DATE NOT NULL DEFAULT CURRENT_DATE,
+	CONSTRAINT PK_grocery_list PRIMARY KEY (grocery_list_id),
+	CONSTRAINT FK_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+
 );
+
 
 
 
@@ -26,7 +43,7 @@ CREATE TABLE grocery_list(
 CREATE TABLE product(
 	product_id serial NOT NULL,
 	name varchar(100) NOT NULL,
-	CONSTRAINT PK_product PRIMARY KEY (service_id)
+	CONSTRAINT PK_product PRIMARY KEY (product_id)
 );
 
 
@@ -40,10 +57,11 @@ CREATE TABLE list_entry(
 	cost numeric(7,2) NOT NULL,
 	grocery_list_id int NOT NULL,
 	product_id int NOT NULL,
-	category int NOT NULL
+	--category int NOT NULL,
 	CONSTRAINT PK_list_entry PRIMARY KEY (list_entry_id),
-	CONSTRAINT FK_grocery_list FOREIGN KEY(grocery_list_id) REFERENCES grocery_list (grocery_list_id)
+	CONSTRAINT FK_grocery_list FOREIGN KEY(grocery_list_id) REFERENCES grocery_list (grocery_list_id),
 	CONSTRAINT FK_product FOREIGN KEY(product_id) REFERENCES product (product_id)
+
 
 );
 
@@ -72,8 +90,8 @@ CREATE TABLE list_entry(
 -- Step 1a: Insert test data into the customer table and select it back out.
 **************************************************************************/
 INSERT INTO grocery_list (created_date) VALUES
-	('2023-12-22'),
-SELECT * FROM grocery_list;
+	('2023-12-22');
+--SELECT * FROM grocery_list;
 
 
 /**************************************************************************
@@ -83,9 +101,9 @@ INSERT INTO product (name) VALUES
 	('Banana'),
 	('Cereal'),
 	('Pork loin'),
-	('Toilet paper'),
+	('Toilet paper');
 
-SELECT * FROM product;
+--SELECT * FROM product;
 
 
 /**************************************************************************
@@ -95,9 +113,9 @@ INSERT INTO list_entry (quantity, cost, grocery_list_id, product_id) VALUES
 	('3', '2.5', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Banana')),
 	('2', '3', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Cereal')),
 	('10', '30', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Toilet paper')),
-	('1', '4', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Pork loin')),
+	('1', '4', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Pork loin'));
 
-SELECT * FROM list_entry;
+--SELECT * FROM list_entry;
 
 
 

@@ -1,8 +1,5 @@
 package org.example;
 
-import org.example.DAO.GroceryListDao;
-import org.example.DAO.ListEntryDao;
-import org.example.DAO.ProductDao;
 import org.example.Model.GroceryList;
 import org.example.Model.ListEntry;
 import org.example.Model.Product;
@@ -24,30 +21,24 @@ public class GroceryListAdminController {
     private ListEntryService listEntryService = new ListEntryService();
 
     private ProductService productService = new ProductService();
-    private GroceryListDao groceryListDao;
 
-    private ListEntryDao listEntryDao;
-
-    private ProductDao productDao;
-    private static final List<GroceryList> GROCERY_LISTS = new ArrayList<>();
-    private static final List<Product> PRODUCTS = new CopyOnWriteArrayList<>();
-    private static final List<ListEntry> LIST_ENTRIES = new CopyOnWriteArrayList<>();
+    ////// private static final List<GroceryList> GROCERY_LISTS = new ArrayList<>();
+    //// private static final List<Product> PRODUCTS = new CopyOnWriteArrayList<>();
+    //private static final List<ListEntry> LIST_ENTRIES = new CopyOnWriteArrayList<>();
     private static final Scanner sc = new Scanner(System.in);
 
-    public GroceryListAdminController(GroceryListDao groceryListDao, ListEntryDao listEntryDao, ProductDao productDao) {
-        this.groceryListDao = groceryListDao;
-        this.listEntryDao = listEntryDao;
-        this.productDao = productDao;
+    public GroceryListAdminController() {
+
     }
 
 
     // private GroceryListDao groceryListDao;
-private void handleGroceryLists(){
+    private void handleGroceryLists() {
         groceryListService.getGroceryLists();
 
-}
-    public void displayMain() {
+    }
 
+    public void displayMain() {
 
         System.lineSeparator();
         mainMenu();
@@ -55,6 +46,7 @@ private void handleGroceryLists(){
     }
 
     public void mainMenu() {
+
         List<GroceryList> groceryLists = groceryListService.getGroceryLists();
 
         if (groceryLists.size() == 0) {//if no grocery lists immediately load create list product menu
@@ -65,34 +57,40 @@ private void handleGroceryLists(){
             System.out.println("1. Create new grocery list");
             System.out.println("2. Edit existing grocery lists" + System.lineSeparator());
             System.out.println("Please make your selection: ");
-
-            String menuNumber = sc.nextLine();
-            mainMenuSelection(Integer.parseInt(menuNumber));
+            do {// do loop to make sure inputs are correct
+                try {
+                    String menuNumber = sc.nextLine();
+                    int menuNumberParsed = Integer.parseInt(menuNumber);
+                    if (menuNumberParsed > 2) {
+                        System.out.println("Incorrect menu number. Enter either 1 or 2");
+                    } else {
+                        mainMenuSelection(Integer.parseInt(menuNumber));
+                    }
+                } catch (Exception e) {
+                    System.out.println("Couldn't parse input, please try again");
+                }
+            } while (true);
         }
+
     }
 
     public void mainMenuSelection(int menuNumber) {
         if (menuNumber == 1) {
             createGroceryList();
-        }
-        if (menuNumber == 2) {
+        } else if (menuNumber == 2) {
             getLists();
+        } else {
+            mainMenu();
         }
     }
 
     public void createGroceryList() {
         //create list
 
-        //groceryListDao.createGrocery();
         LocalDate date = LocalDate.now();
         GroceryList groceryList = new GroceryList(date);
         GroceryList createdList = groceryListService.createGrocery(groceryList);
 
-
-        //GROCERY_LISTS.add(createdList);
-
-        //temp to set list ids. can pull from dao later
-      //  groceryList.setListId(GROCERY_LISTS.indexOf(groceryList) + 1);
         addProductMenu(createdList);
     }
 
@@ -162,10 +160,10 @@ private void handleGroceryLists(){
 
 
         for (ListEntry listEntry : listEntriesByID) {//loop through and print entries tied to list id
-           // if (listEntry.getListId() == listId) {
-                System.out.println("" + "." + listEntry.toString());
-                //myList.add(listEntry);
-          //  }
+            // if (listEntry.getListId() == listId) {
+            System.out.println(listEntry.toString());
+            //myList.add(listEntry);
+            //  }
         }
 
         System.out.println("Enter ID to edit:");
@@ -183,6 +181,7 @@ private void handleGroceryLists(){
                 if (listEntry.getListEntryId() == entryId) {
                     System.out.println("Please update product properties for: " + listEntry.getProductName());
                     System.out.println("Enter new quantity and cost, separated by comma ex: 10,9: ");
+
                     String str = sc.nextLine();
                     List<String> updates = Arrays.asList(str.split(","));
                     listEntry.setQuantity(Double.parseDouble(updates.get(0)));
@@ -195,6 +194,7 @@ private void handleGroceryLists(){
                     //ListEntry updatedEntry = listEntryService.getListEntryById(listEntry.getListEntryId());
 
                     System.out.println("Updated value:" + listEntry.toString());
+                    mainOrExitMenu();
                 }
             }
         }
@@ -204,7 +204,7 @@ private void handleGroceryLists(){
 
                     listEntryService.deleteListEntry(entryId);
 
-                    LIST_ENTRIES.remove(listEntry);
+                    //LIST_ENTRIES.remove(listEntry);
                     System.out.println("List Entry deleted");//return to entry menu
                     mainMenu();
                 }
@@ -218,52 +218,94 @@ private void handleGroceryLists(){
         System.out.println("3. Delete List");
         System.out.println("4. Print List");
 
-        System.out.println(listId);
-        String nextMenu = sc.nextLine();
-        int nextMenuChoice = Integer.parseInt(nextMenu);
-        List<GroceryList> retrievedLists = groceryListService.getGroceryLists();
 
-        if (nextMenuChoice == 1) { //if 1 go and add more products to the list
-            addProductMenu(groceryListService.getGroceryListById(listId));
-            System.out.println(groceryListService.getGroceryListById(listId));
-        }
-        if (nextMenuChoice == 2) { //print out all list entries for a grocery list
-            listEntryMenu(listId);
-        }
-        if (nextMenuChoice == 3) {
-            System.out.println("" + listId);
-            ;
-            for(ListEntry listEntry: listEntryService.getListEntriesByListId(listId)){
-                listEntryService.deleteListEntry(listEntry.getListEntryId());
+        // System.out.println(listId);
+        int nextMenuChoice = 0;
+        do {
+            try {
+                String nextMenu = sc.nextLine();
+                nextMenuChoice = Integer.parseInt(nextMenu);
+
+            } catch (Exception e) {
+                System.out.println("Couldn't parse input, please try again");
             }
-            groceryListService.deleteGroceryList(listId);
-            //GROCERY_LISTS.remove(listId - 1);
-            System.out.println("List deleted");
-            mainMenu();
-            System.out.println();
-        }
-        if(nextMenuChoice == 4){
-            printGroceryList(listId);
+            if (nextMenuChoice > 4) {
+                System.out.println("Input must be between 1 and 4, try again");
+            }
+            if (nextMenuChoice == 1) { //if 1  go and add more products to the list
+                addProductMenu(groceryListService.getGroceryListById(listId));
+                System.out.println(groceryListService.getGroceryListById(listId));
+            }
+            if (nextMenuChoice == 2) { //print out all list entries for a grocery list
+                listEntryMenu(listId);
+            }
+            if (nextMenuChoice == 3) {
+                System.out.println("" + listId);
+                ;
+                for (ListEntry listEntry : listEntryService.getListEntriesByListId(listId)) {
+                    listEntryService.deleteListEntry(listEntry.getListEntryId());
+                }
+                groceryListService.deleteGroceryList(listId);
+                //GROCERY_LISTS.remove(listId - 1);
+                System.out.println("List deleted");
+                mainMenu();
+                System.out.println();
+            }
+            if (nextMenuChoice == 4) {
+                printGroceryList(listId);
 
-        }
+            }
+        } while (true);
+
     }
 
     public void printGroceryList(int groceryListID) {
         double finalCost = 0.00;
 
         for (ListEntry listEntry : listEntryService.getListEntriesByListId(groceryListID)) {
-           // if (listEntry.getListId() == groceryListID) {
-                System.lineSeparator();
-                System.out.println(listEntry.toString());
-                finalCost = finalCost + listEntry.getTotal();
-           // }
+            // if (listEntry.getListId() == groceryListID) {
+            System.lineSeparator();
+            System.out.println(listEntry.toString());
+            finalCost = finalCost + listEntry.getTotal();
+            // }
         }
         System.out.println("Your list total is $" + finalCost + System.lineSeparator());
+
+        mainOrExitMenu();
+
+    }
+
+    public void mainOrExitMenu() {
+
+        System.out.println("1. Return to Main Menu");
+        System.out.println("2. Exit");
+
+        do {
+            //input = false;
+            try {
+                String menuNumber = sc.nextLine();
+                int menuNumberParsed = Integer.parseInt(menuNumber);
+                if (menuNumberParsed == 1) {
+                    mainMenu();
+                } else if (menuNumberParsed == 2) {
+                    System.exit(0);
+                }
+                if (menuNumberParsed > 2) {
+                    System.out.println("Incorrect menu number. Enter either 1 or 2");
+                } else {
+                    mainMenuSelection(Integer.parseInt(menuNumber));
+                }
+            } catch (Exception e) {
+                System.out.println("Couldn't parse input, please try again");
+            }
+
+        } while (true);
+
+
     }
 
     public void mapToListEntries(String quantity, String cost, GroceryList
             groceryList, Product product, int category) {
-
 
 
         ListEntry newEntry = new ListEntry();
@@ -283,9 +325,8 @@ private void handleGroceryLists(){
         Product newProduct = new Product(name);
         Product createdProduct = productService.createProduct(newProduct);
         //System.out.println(createdProduct.getProductName() + " " +createdProduct.getProductId());
-        newProduct.setProductId(PRODUCTS.size() + 1);
-        PRODUCTS.add(newProduct);
-
+        //newProduct.setProductId(PRODUCTS.size() + 1);
+        // PRODUCTS.add(newProduct);
 
 
         mapToListEntries(quantity, cost, groceryList, createdProduct, productNumber);
@@ -318,7 +359,7 @@ private void handleGroceryLists(){
                     }
                 }
             } //if empty just add new product
-             if (found == false){
+            if (found == false) {
                 addNewProduct(name, quantity, cost, groceryList, category);
             }
 
@@ -347,7 +388,7 @@ private void handleGroceryLists(){
                     }
                 }
             } //if empty just add new product
-            if (found == false){
+            if (found == false) {
                 addNewProduct(name, quantity, cost, groceryList, category);
             }
         }
