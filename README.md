@@ -1,3 +1,6 @@
-# grocery_list_maker
+# Grocery List Maker
 
-hello
+Hello. 
+
+This is a console app for creating and saving grocery lists. 
+
