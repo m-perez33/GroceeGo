@@ -241,7 +241,7 @@ public class GroceryListAdminController {
         System.out.println("4. Print List");
 
         int nextMenuChoice = 0;
-        do {//do loop to make sure inputs are correct
+        do {// do loop to make sure inputs are correct
             try {
                 String nextMenu = sc.nextLine();
                 nextMenuChoice = Integer.parseInt(nextMenu);
