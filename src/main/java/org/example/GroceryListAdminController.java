@@ -214,7 +214,7 @@ public class GroceryListAdminController {
                     listEntryService.updateListEntry(listEntry);
 
                     //since its a put request, dont need to retrieve data
-                   // ListEntry updatedEntry = listEntryService.getListEntryById(listEntry.getListEntryId());
+                   //ListEntry updatedEntry = listEntryService.getListEntryById(listEntry.getListEntryId());
 
                     System.out.println("Updated value:" + listEntry.toString());
                     mainOrExitMenu();
