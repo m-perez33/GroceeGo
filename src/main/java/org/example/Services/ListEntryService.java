@@ -90,7 +90,7 @@ public class ListEntryService {
 
         boolean success = false;
         try {
-            restTemplate.put(API_BASE_URL + updatedListEntry.getListEntryId(), entity);
+            restTemplate.put(API_BASE_URL + "/" + updatedListEntry.getListEntryId(), entity);
             success = true;
         } catch (RestClientResponseException e) {
             System.out.println(e.getRawStatusCode() + " : " + e.getStatusText());

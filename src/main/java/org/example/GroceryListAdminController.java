@@ -22,17 +22,12 @@ public class GroceryListAdminController {
 
     private ProductService productService = new ProductService();
 
-    ////// private static final List<GroceryList> GROCERY_LISTS = new ArrayList<>();
-    //// private static final List<Product> PRODUCTS = new CopyOnWriteArrayList<>();
-    //private static final List<ListEntry> LIST_ENTRIES = new CopyOnWriteArrayList<>();
     private static final Scanner sc = new Scanner(System.in);
 
     public GroceryListAdminController() {
 
     }
 
-
-    // private GroceryListDao groceryListDao;
     private void handleGroceryLists() {
         groceryListService.getGroceryLists();
 
@@ -100,11 +95,24 @@ public class GroceryListAdminController {
         System.out.println("Please select product category: ");
         System.out.println("1. Add product measured per lb. (produce, deli, meat)");
         System.out.println("2. Add products measured per item (dry goods, toiletries, beverages)");
+        do {// do loop to make sure inputs are correct
+            try {
+                String menuNumber = sc.nextLine();
+                int menuNumberParsed = Integer.parseInt(menuNumber);
+                if (menuNumberParsed > 2) {
+                    System.out.println("Incorrect menu number. Enter either 1 or 2");
+                } else {
+                    loadProductData(Integer.parseInt(menuNumber), groceryList);
+                    subAddProductMenu(groceryList);
+                }
+            } catch (Exception e) {
+                System.out.println("Couldn't parse input, please try again bro");
+            }
 
-        String menuNumber = sc.nextLine();
-        loadProductData(Integer.parseInt(menuNumber), groceryList);
+        } while (true);
+//
 
-        subAddProductMenu(groceryList);
+
     }
 
     public void subAddProductMenu(GroceryList groceryList) {
@@ -113,11 +121,23 @@ public class GroceryListAdminController {
         System.out.println("1. Add another product");
         System.out.println("2. Print grocery list");
         System.out.println("3. Return to Main menu");
+        do {// do loop to make sure inputs are correct
+            try {
+                String menuNumber = sc.nextLine();
+                int menuNumberParsed = Integer.parseInt(menuNumber);
+                if (menuNumberParsed > 2) {
+                    System.out.println("Incorrect menu number. Try again");
+                } else {
+                    subMenuSelection(Integer.parseInt(menuNumber), groceryList);
+                    mainMenu();
 
-        String menuNumber = sc.nextLine();
-        subMenuSelection(Integer.parseInt(menuNumber), groceryList);
+                }
+            } catch (Exception e) {
+                System.out.println("Couldn't parse input, please try again bro");
+            }
 
-        mainMenu();
+            // String menuNumber = sc.nextLine();
+        } while (true) ;
     }
 
     public void subMenuSelection(int menuNumber, GroceryList groceryList) {
@@ -139,7 +159,7 @@ public class GroceryListAdminController {
         int count = 1;
         //print out all of users lists
         for (GroceryList groceryList : groceryLists) {
-            System.out.println("" + count + ". " + "Grocery List " + count + groceryList.toString());
+            System.out.println("" + count + ". " + "Grocery List " + groceryList.toString());
             count++;
         }
 
@@ -158,10 +178,14 @@ public class GroceryListAdminController {
 
         List<ListEntry> listEntriesByID = listEntryService.getListEntriesByListId(listId);
 
-
+        if(listEntriesByID.size() == 0){
+            System.out.println("no entries: please add to the list");
+            subListMenu(listId);
+        }else{
         for (ListEntry listEntry : listEntriesByID) {//loop through and print entries tied to list id
             // if (listEntry.getListId() == listId) {
-            System.out.println(listEntry.toString());
+
+            System.out.println(listEntry.toString());}
             //myList.add(listEntry);
             //  }
         }
@@ -189,9 +213,8 @@ public class GroceryListAdminController {
 
                     listEntryService.updateListEntry(listEntry);
 
-
                     //since its a put request, dont need to retrieve data
-                    //ListEntry updatedEntry = listEntryService.getListEntryById(listEntry.getListEntryId());
+                   // ListEntry updatedEntry = listEntryService.getListEntryById(listEntry.getListEntryId());
 
                     System.out.println("Updated value:" + listEntry.toString());
                     mainOrExitMenu();
@@ -204,7 +227,6 @@ public class GroceryListAdminController {
 
                     listEntryService.deleteListEntry(entryId);
 
-                    //LIST_ENTRIES.remove(listEntry);
                     System.out.println("List Entry deleted");//return to entry menu
                     mainMenu();
                 }
@@ -218,10 +240,8 @@ public class GroceryListAdminController {
         System.out.println("3. Delete List");
         System.out.println("4. Print List");
 
-
-        // System.out.println(listId);
         int nextMenuChoice = 0;
-        do {
+        do {//do loop to make sure inputs are correct
             try {
                 String nextMenu = sc.nextLine();
                 nextMenuChoice = Integer.parseInt(nextMenu);
@@ -246,8 +266,8 @@ public class GroceryListAdminController {
                     listEntryService.deleteListEntry(listEntry.getListEntryId());
                 }
                 groceryListService.deleteGroceryList(listId);
-                //GROCERY_LISTS.remove(listId - 1);
-                System.out.println("List deleted");
+
+                System.out.println("List " + "7" + " deleted");
                 mainMenu();
                 System.out.println();
             }
@@ -321,13 +341,9 @@ public class GroceryListAdminController {
 
     public void addNewProduct(String name, String quantity, String cost,
                               GroceryList groceryList, int productNumber) {
-        // first create product
+
         Product newProduct = new Product(name);
         Product createdProduct = productService.createProduct(newProduct);
-        //System.out.println(createdProduct.getProductName() + " " +createdProduct.getProductId());
-        //newProduct.setProductId(PRODUCTS.size() + 1);
-        // PRODUCTS.add(newProduct);
-
 
         mapToListEntries(quantity, cost, groceryList, createdProduct, productNumber);
     }
