@@ -23,10 +23,11 @@ than products with cost by item. Being able to add the estimates to the list mak
 1. Clone the repository
    ```bash
    git clone https://github.com/m-perez33/GroceeGo.git
+   ```
 
-Open the project in IntelliJ IDEA by choosing "Open" or "Import Project."
-Locate the main class of the console app.
-Right-click on the main class file and select "Run" to execute the application.
+2. Open the project in IntelliJ IDEA by choosing "Open" or "Import Project."
+3. Locate the main class of the console app.
+4. Right-click on the main class file and select "Run" to execute the application.
 
 ## Back-end (Console App)
 
