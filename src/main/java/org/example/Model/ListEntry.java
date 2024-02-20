@@ -96,14 +96,14 @@ public class ListEntry {
         //if statemtnt to print differntly depending on product category
 
         if (category == 1) {
-            return "ID: " + listEntryId + System.lineSeparator() + "Product: " + productName + System.lineSeparator() +
-                    "Quantity: " + quantity + " lbs" + System.lineSeparator() +
-                    "Cost per pound: " + cost + System.lineSeparator() +
-                    "Total cost: $" + getTotal() + System.lineSeparator();
+            return "ID: " + listEntryId + " || " + "Product: " + productName + " || "+
+                    "Quantity: " + quantity + " lbs" + " || "+
+                    "Cost per pound: " + cost + " || " +
+                    "Total cost: $" + getTotal() + System.lineSeparator() ;
         } else {
-            return "ID: " + listEntryId + System.lineSeparator() + "Product: " + productName + System.lineSeparator() +
-                    "Quantity: " + quantity + System.lineSeparator() +
-                    "Cost per item: " + cost + System.lineSeparator() +
+            return "ID: " + listEntryId + " || " + "Product: " + productName + " || "+
+                    "Quantity: " + quantity + " || " +
+                    "Cost per item: " + cost + " || " +
                     "Total cost: $" + getTotal() + System.lineSeparator();
                     //"Category: " + category;
 

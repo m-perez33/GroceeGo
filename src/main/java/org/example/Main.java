@@ -27,14 +27,14 @@ public class Main {
         // private static GroceryListDao groceryListDao;
 
 
-        BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/GroceryListDB");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("postgres1");
+        //BasicDataSource dataSource = new BasicDataSource();
+        //dataSource.setUrl("jdbc:postgresql://localhost:5432/GroceryListDB");
+        //dataSource.setUsername("postgres");
+        //dataSource.setPassword("postgres1");
 
-        GroceryListDao groceryListDao = new JdbcGroceryListDao(dataSource);
-        ListEntryDao listEntryDao = new JdbcListEntryDao(dataSource);
-        ProductDao productDao = new JdbcProductDao(dataSource);
+        //GroceryListDao groceryListDao = new JdbcGroceryListDao(dataSource);
+        //ListEntryDao listEntryDao = new JdbcListEntryDao(dataSource);
+       // ProductDao productDao = new JdbcProductDao(dataSource);
 
         System.lineSeparator();
         // mainMenu(groceryListDao);

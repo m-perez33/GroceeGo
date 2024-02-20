@@ -57,7 +57,7 @@ CREATE TABLE list_entry(
 	cost numeric(7,2) NOT NULL,
 	grocery_list_id int NOT NULL,
 	product_id int NOT NULL,
-	--category int NOT NULL,
+	category int NOT NULL,
 	CONSTRAINT PK_list_entry PRIMARY KEY (list_entry_id),
 	CONSTRAINT FK_grocery_list FOREIGN KEY(grocery_list_id) REFERENCES grocery_list (grocery_list_id),
 	CONSTRAINT FK_product FOREIGN KEY(product_id) REFERENCES product (product_id)
@@ -109,11 +109,11 @@ INSERT INTO product (name) VALUES
 /**************************************************************************
 -- Step 4a: Insert test data into the pet table and select it back out.
 **************************************************************************/
-INSERT INTO list_entry (quantity, cost, grocery_list_id, product_id) VALUES
-	('3', '2.5', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Banana')),
-	('2', '3', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Cereal')),
-	('10', '30', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Toilet paper')),
-	('1', '4', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Pork loin'));
+INSERT INTO list_entry (quantity, cost, grocery_list_id, product_id, category) VALUES
+	('3', '2.5', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Banana'), '1'),
+	('2', '3', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Cereal'), '2'),
+	('10', '30', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Toilet paper'), '2'),
+	('1', '4', (Select grocery_list_id from grocery_list), (Select product_id from product where name = 'Pork loin'), '1');
 
 --SELECT * FROM list_entry;
 
