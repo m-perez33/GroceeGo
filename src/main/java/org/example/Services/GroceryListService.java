@@ -19,26 +19,13 @@ public class GroceryListService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     private String authToken = null;
-    //List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
 
-    //MappingJackson2XmlHttpMessageConverter converter = new MappingJackson2XmlHttpMessageConverter();
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
     }
 
 
-   /* public List<GroceryList> getGroceryLists() {
-        GroceryList[] groceryLists = null;
-
-            ResponseEntity<GroceryList[]> response = restTemplate.exchange(API_BASE_URL,
-                    HttpMethod.GET, makeAuthEntity(), GroceryList[].class);
-            groceryLists = response.getBody();
-
-            List<GroceryList> groceryLists1 = Arrays.asList(groceryLists);
-
-        return groceryLists1;
-    }*/
 
 
     public List<GroceryList> getGroceryLists() {
